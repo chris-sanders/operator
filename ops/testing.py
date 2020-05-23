@@ -149,6 +149,13 @@ class Harness:
 
         return charm.CharmMeta.from_yaml(charm_metadata, action_metadata)
 
+    def _create_resources(self):
+        """Add resources to backend."""
+        for name, data in self._meta['resources'].items():
+            if data['type'] == "oci-image":
+                # Handle OCI Images
+                self._backend._resources_map[name] = self._charm_dir / f'resources/{name}.yaml'
+
     def disable_hooks(self) -> None:
         """Stop emitting hook events when the model changes.
 
