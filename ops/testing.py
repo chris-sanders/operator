@@ -73,6 +73,7 @@ class Harness:
         self._backend = _TestingModelBackend(self._unit_name, self._meta)
         self._model = model.Model(self._unit_name, self._meta, self._backend)
         self._framework = framework.Framework(":memory:", self._charm_dir, self._meta, self._model)
+        self._create_resources()
 
     @property
     def charm(self) -> charm.CharmBase:
