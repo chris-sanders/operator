@@ -16,6 +16,7 @@ import inspect
 import pathlib
 from textwrap import dedent
 import typing
+import yaml
 
 from ops import charm, framework, model
 
@@ -152,10 +153,20 @@ class Harness:
 
     def _create_resources(self):
         """Add resources to backend."""
-        for name, data in self._meta['resources'].items():
-            if data['type'] == "oci-image":
+        for name, data in self._meta.resources.items():
+            if data.type == "oci-image":
                 # Handle OCI Images
-                self._backend._resources_map[name] = self._charm_dir / f'resources/{name}.yaml'
+                resource_dir = self._charm_dir / f'resources/{name}/'
+                resource_file = resource_dir / f'{name}.yaml'
+                self._backend._resources_map[name] = resource_file
+                resource_dir.mkdir(parents=True, exist_ok=True)
+                resource_meta = {'registrypath': 'registrypath',
+                                 'username': 'username',
+                                 'password': 'password',
+                                 }
+                with resource_file.open('w') as resource_yaml:
+                    # Write the yaml file
+                    yaml.dump(resource_meta, resource_yaml)
 
     def disable_hooks(self) -> None:
         """Stop emitting hook events when the model changes.
